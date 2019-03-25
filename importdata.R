@@ -165,7 +165,7 @@ head(etf4.reorder)
 str(etf4.reorder)
 # convert character into numeric 
 # convert to xts
-#install.packages("xts")
+install.packages("xts")
 library(xts)
 etf4.xts<-xts(etf4.reorder[,-1], order.by = etf4.reorder$date)
 head(etf4.xts)
@@ -187,7 +187,7 @@ head(etf4.xts.fill)
 etf4.xts<-na.omit(etf4.xts)
 head(etf4.xts)
 # or complete cases
-#install.packages("tidyr")
+install.packages("tidyr")
 library(tidyr)
 etf4.xts1<-etf4.xts[complete.cases(etf4.xts),]
 head(etf4.xts1)
@@ -229,7 +229,7 @@ first(lastweek, "-2 days")
 #------------------------------------------------------------
 # Converting Daily Prices to Monthly Returns in the xts world
 #------------------------------------------------------------
-#install.packages('quantmod')
+install.packages('quantmod')
 library(quantmod)
 etf4_monthly <- to.monthly(etf4.xts, indexAt = "lastof", OHLC=FALSE)
 head(etf4_monthly)
@@ -243,7 +243,7 @@ etf4_weekly <- etf4.xts[endpoints(etf4.xts, on="weeks", k=1), ]
 head(etf4_weekly)
 dim(etf4_weekly)
 #
-#install.packages('PerformanceAnalytics', 'magrittr')
+install.packages('PerformanceAnalytics', 'magrittr')
 library(PerformanceAnalytics)
 library(magrittr)
 etf4_returns_xts <-Return.calculate(etf4_monthly, method = "log") %>%
@@ -267,12 +267,14 @@ plot(etf4_ret.df1$`0050`, etf4_ret.df1$`00646`, pch=20,
      col = 'darkred', main = '0050 vs. 00646 monthly returns',
      xlab = '0050', ylab = '00646 S&P500')
 #-----------------------------------------------------------
-#install.packages("tidyverse")
+install.packages("tidyverse")
 library(tidyverse)
+install.packages("ggplot2")
 library(ggplot2)
 # convert xts into data frame which can be used by ggplot
 # split date index in xts into year, month and day columns 
 # using lubridate package
+install.packages("lubridate")
 library(lubridate)
 etf4_ret.df2 <- cbind(etf4_ret.df1, month=month(index(etf4_returns_xts)), 
                       year=year(index(etf4_returns_xts)))
@@ -290,17 +292,17 @@ etf4_ret
 etf4_ret.tmp<-data.frame(date = index(etf4_returns_xts), etf4_ret)
 head(etf4_ret.tmp)
 # or you can use the following code
-etf4_ret.tmp<-etf4_returns_xts %>% 
-  data.frame(date=index(.)) %>% 
-  remove_rownames() %>% 
-  gather(asset, return, -date) # turn data into long format
+#etf4_ret.tmp<-etf4_returns_xts %>% 
+ # data.frame(date=index(.)) %>% 
+  #remove_rownames() %>% 
+  #gather(asset, return, -date) # turn data into long format
 
 head(etf4_ret.tmp)
 #
 plot(etf4_ret.tmp$X0050, etf4_ret.tmp$X0056)
 #
 ggplot(etf4_ret.tmp) +
-  geom_point(mapping = aes(x = etf4_ret.tmp$`0050`, y = etf4_ret.tmp$`0056`))
+  geom_point(mapping = aes(x = etf4_ret.tmp$`0050`, y = etf4_ret.tmp$`X0056`))
 #
 
 etf4_ret.df<-fortify(etf4_returns_xts, melt=TRUE)
@@ -308,7 +310,7 @@ head(etf4_ret.df)
 #
 p<-ggplot(etf4_ret.df, aes(x = Index, y = Value))+
   geom_line(aes(color = Series), size = 1)
-
+p
 p + scale_x_date(date_labels = "%Y/%m")
 
 # histogram distribution
@@ -316,6 +318,7 @@ q<-etf4_ret.df %>%
   ggplot(aes(x =Value, fill = Series)) +
   geom_histogram(alpha = 0.45, binwidth = .005) +
   ggtitle("Monthly Returns")
+q
 q + facet_wrap(~Series)+ theme_update(plot.title = element_text(hjust = 0.5))
 
 
@@ -341,9 +344,11 @@ etf4_ret.df %>%
   theme_update(plot.title = element_text(hjust = 0.5))
 
 #---------------------------------------------------------------
-
-
-
-
-
+install.packages("plotly")
+library(plotly)
+p1<-plot_ly(etf4_ret.tmp, X = ~date, y=~X0050,name = "0050",type='scatter',mode = 'lines')%>%
+   add_trace(y=~X0056,name='0056',mode='lines+markers')%>%
+   layout(xaxis=list(title='year'),yaxis=list(title='monthly returns'))
+p1
+            
 
